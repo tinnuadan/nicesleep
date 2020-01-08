@@ -4,20 +4,23 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class NiceSleep extends JavaPlugin {
 
-    private PlayerBedEventListener _bedEventListener;
+  private PlayerBedEventListener bedEventListener;
+  private NightSkip nightSkip;
 
-    public NiceSleep()
-    {
-        _bedEventListener = null;
-    }
+  public NiceSleep() {
+    bedEventListener = null;
+    nightSkip = null;
+  }
 
-    @Override
-    public void onEnable() {
-        _bedEventListener = new PlayerBedEventListener(this);
-        getLogger().info("NiceSleep enabled!");
-    }
-    @Override
-    public void onDisable() {
-        getLogger().info("NiceSleep disabled!");
-    }
+  @Override
+  public void onEnable() {
+    nightSkip = new NightSkip(this, 10);// TODO: read from config
+    bedEventListener = new PlayerBedEventListener(this, nightSkip);
+    getLogger().info("NiceSleep enabled!");
+  }
+
+  @Override
+  public void onDisable() {
+    getLogger().info("NiceSleep disabled!");
+  }
 }
