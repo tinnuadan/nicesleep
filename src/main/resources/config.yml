@@ -1,0 +1,9 @@
+#config for NiceSleep
+
+#percentage of not-afk players needed to skip the night (0 - 100).
+#0 means that any player can skip the night on their own
+percentage_needed: 0
+
+#how long the plugin waits once a suffient number of players is in bed before skipping the night
+#note that 5.05 seconds is the vanilla waiting period
+seconds_before_skip: 5.0

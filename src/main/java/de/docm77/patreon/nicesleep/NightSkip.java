@@ -12,12 +12,14 @@ public class NightSkip implements NightSkipEventHandler, PlayerSleepEventHandler
 
   private JavaPlugin plugin;
   private double neededPercentage;
+  private int skipDelay;
   private HashSet<Player> playersInBed;
   private HashMap<World, NightSkipTimer> nightSkipTimers;
 
-  public NightSkip(JavaPlugin plugin, int neededPercentage) {
+  public NightSkip(JavaPlugin plugin, int neededPercentage, double secondsBeforeSkip) {
     this.plugin = plugin;
     this.neededPercentage = ((double) neededPercentage) / 100.;
+    this.skipDelay = (int)(Math.round(secondsBeforeSkip * 1000.0));
     this.nightSkipTimers = new HashMap<World, NightSkipTimer>();
 
     playersInBed = new HashSet<Player>();
@@ -113,7 +115,7 @@ public class NightSkip implements NightSkipEventHandler, PlayerSleepEventHandler
 
   private NightSkipTimer getTimer(World world) {
     if (!nightSkipTimers.containsKey(world)) {
-      nightSkipTimers.put(world, new NightSkipTimer(world, 2000, this));
+      nightSkipTimers.put(world, new NightSkipTimer(world, skipDelay, this));
     }
     return nightSkipTimers.get(world);
   }
