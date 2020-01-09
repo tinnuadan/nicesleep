@@ -11,13 +11,13 @@ public class NightSkipTimer implements ActionListener {
 
   private World world;
   private Timer timer;
-  private NightSkipEvent skipEvent;
+  private NightSkipEventHandler skipEventHandler;
 
-  NightSkipTimer(World world, int delay, NightSkipEvent skipEvent) {
+  NightSkipTimer(World world, int delay, NightSkipEventHandler skipEvent) {
     this.world = world;
     this.timer = new Timer(delay, this);
     this.timer.setRepeats(false);
-    this.skipEvent = skipEvent;
+    this.skipEventHandler = skipEvent;
   }
 
   void start() {
@@ -34,7 +34,7 @@ public class NightSkipTimer implements ActionListener {
 
   @Override
   public void actionPerformed(ActionEvent e) {
-    skipEvent.nightSkipped(world);
+    skipEventHandler.nightSkipped(world);
   }
 
 }

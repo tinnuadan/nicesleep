@@ -8,7 +8,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.util.HashSet;
 import java.util.HashMap;
 
-public class NightSkip implements NightSkipEvent, PlayerSleepEventHandler, PlayerWorldChangeEventHandler {
+public class NightSkip implements NightSkipEventHandler, PlayerSleepEventHandler, PlayerWorldChangeEventHandler {
 
   private JavaPlugin plugin;
   private double neededPercentage;
