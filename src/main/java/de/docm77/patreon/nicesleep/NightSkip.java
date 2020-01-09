@@ -5,82 +5,79 @@ import org.bukkit.World;
 import org.bukkit.command.CommandException;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
-import java.util.Set;
 import java.util.HashSet;
+import java.util.HashMap;
 
-public class NightSkip implements PlayerSleepEvent {
+public class NightSkip implements PlayerSleepEvent, NightSkipEvent {
 
   private JavaPlugin plugin;
   private double neededPercentage;
   private HashSet<Player> playersInBed;
+  private HashMap<World, NightSkipTimer> nightSkipTimers;
 
-  public NightSkip(JavaPlugin plugin, int neededPercentage)
-  {
+  public NightSkip(JavaPlugin plugin, int neededPercentage) {
     this.plugin = plugin;
-    this.neededPercentage = ((double)neededPercentage)/100.; 
+    this.neededPercentage = ((double) neededPercentage) / 100.;
+    this.nightSkipTimers = new HashMap<World, NightSkipTimer>();
 
     playersInBed = new HashSet<Player>();
   }
 
   @Override
-  public void playerEnteredBed(Player player)
-  {
+  public void playerEnteredBed(Player player) {
     playersInBed.add(player);
-    checkSleeping(player.getWorld());
+    checkSleeping(player.getWorld(), true);
   }
 
   @Override
-  public void playerLeftBed(Player player)
-  {
+  public void playerLeftBed(Player player) {
     playersInBed.remove(player);
-    checkSleeping(player.getWorld());
+    checkSleeping(player.getWorld(), false);
   }
 
-  private void checkSleeping(World world)
-  {
+  private void checkSleeping(World world, boolean enteredBed) {
     Server srv = this.plugin.getServer();
     CustomCommandSender sender = new CustomCommandSender(srv.getConsoleSender());
     int afkPlayers = 0;
     int totalPlayersInWorld = 0;
     int sleepingPlayers = 0;
-    for(Player p : srv.getOnlinePlayers())
-    {
-      if(p.getWorld() == world)
-      {
+    for (Player p : srv.getOnlinePlayers()) {
+      if (p.getWorld() == world) {
         boolean afk = false;
-        try
-        {
+        try {
           srv.dispatchCommand(sender, "afkcheck " + p.getDisplayName());
           afk = !sender.lastMessage.toLowerCase().contains("playing");
+        } catch (CommandException e) {
         }
-        catch(CommandException e)
-        {}
-        if(afk)
-        {
+        if (afk) {
           ++afkPlayers;
         }
-        if(playersInBed.contains(p))
-        { 
+        if (playersInBed.contains(p)) {
           ++sleepingPlayers;
         }
         ++totalPlayersInWorld;
       }
     }
-    this.plugin.getLogger().info("There are " + totalPlayersInWorld + " players in this world. " + sleepingPlayers + " are sleeping and " + afkPlayers + " are afk.");
 
     int neededPlayers = (int) Math.floor((double) (totalPlayersInWorld - afkPlayers) * neededPercentage);
     neededPlayers = Math.max(neededPlayers, 1); // we need at least one in total
     neededPlayers -= sleepingPlayers;
-    if(resetRequired(world))
-    {
-      if (neededPlayers > 0)
-      {
-        plugin.getServer().getConsoleSender().sendMessage("Somebody wants to sleep. " + neededPlayers + " more sleeping players needed.");
+
+    NightSkipTimer timer = getTimer(world);
+    if (resetRequired(world)) {
+      if (neededPlayers > 0 && enteredBed) {
+        this.plugin.getLogger().info("There are " + totalPlayersInWorld + " players in this world. " + sleepingPlayers
+            + " are sleeping and " + afkPlayers + " are afk. For skipping the night " + neededPlayers + " are needed.");
+        plugin.getServer().broadcastMessage(
+            "Somebody wants to sleep in the " + world.getName() + ". " + neededPlayers + " more players needed.");
+      } else if (!timer.isRunning()) {
+        timer.start();
+        plugin.getLogger().info("Starting sleep timer");
       }
-      else
-      {
-        resetDay(world);
-      }
+    }
+    if (neededPlayers > 0 && timer.isRunning()) {
+      plugin.getLogger().info("Cancelling sleep timer");
+      timer.stop();
     }
   }
 
@@ -91,13 +88,27 @@ public class NightSkip implements PlayerSleepEvent {
   }
 
   public boolean resetRequired(World world) {
-    //check if the world is night or thundering
-    if(this.isNight(world) || world.isThundering())
-        return true;
-    return false;
+    // check if the world is night or thundering
+    return (this.isNight(world) || world.isThundering());
   }
 
   public boolean isNight(World world) {
     return (world.getTime() > 12541 && world.getTime() < 23850);
   }
+
+  @Override
+  public void nightSkipped(World world) {
+    plugin.getLogger().info("Night skip requested");
+    if (resetRequired(world)) {
+      resetDay(world);
+    }
+  }
+
+  private NightSkipTimer getTimer(World world) {
+    if (!nightSkipTimers.containsKey(world)) {
+      nightSkipTimers.put(world, new NightSkipTimer(world, 2000, this));
+    }
+    return nightSkipTimers.get(world);
+  }
+
 }
