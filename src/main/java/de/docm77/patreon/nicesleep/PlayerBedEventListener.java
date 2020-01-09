@@ -11,11 +11,11 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class PlayerBedEventListener implements Listener {
 
   JavaPlugin plugin;
-  PlayerSleepEvent sleepEvent;
+  PlayerSleepEventHandler sleepEventHandler;
 
-  public PlayerBedEventListener(JavaPlugin plugin, PlayerSleepEvent sleepEvent) {
+  public PlayerBedEventListener(JavaPlugin plugin, PlayerSleepEventHandler handler) {
     this.plugin = plugin;
-    this.sleepEvent = sleepEvent;
+    this.sleepEventHandler = handler;
 
     this.plugin.getServer().getPluginManager().registerEvents(this, this.plugin);
     this.plugin.getLogger().info("PlayerBedEventListener created");
@@ -31,7 +31,7 @@ public class PlayerBedEventListener implements Listener {
     if (event.getBedEnterResult() == BedEnterResult.OK) {
       Player player = event.getPlayer();
       this.plugin.getLogger().info(player.getDisplayName() + " went to bed");
-      sleepEvent.playerEnteredBed(player);
+      sleepEventHandler.playerEnteredBed(player);
     }
   }
 
@@ -39,7 +39,7 @@ public class PlayerBedEventListener implements Listener {
   void onPlayerBedLeave(PlayerBedLeaveEvent event) {
     Player player = event.getPlayer();
     this.plugin.getLogger().info(player.getDisplayName() + " left the bed");
-    sleepEvent.playerLeftBed(player);
+    sleepEventHandler.playerLeftBed(player);
   }
 
 }
