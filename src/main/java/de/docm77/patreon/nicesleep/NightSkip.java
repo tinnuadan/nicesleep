@@ -8,7 +8,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.util.HashSet;
 import java.util.HashMap;
 
-public class NightSkip implements PlayerSleepEvent, NightSkipEvent {
+public class NightSkip implements PlayerSleepEvent, NightSkipEvent, PlayerWorldChangeEventHandler {
 
   private JavaPlugin plugin;
   private double neededPercentage;
@@ -26,16 +26,22 @@ public class NightSkip implements PlayerSleepEvent, NightSkipEvent {
   @Override
   public void playerEnteredBed(Player player) {
     playersInBed.add(player);
-    checkSleeping(player.getWorld(), true);
+    checkSleeping(player.getWorld());
   }
 
   @Override
   public void playerLeftBed(Player player) {
     playersInBed.remove(player);
-    checkSleeping(player.getWorld(), false);
+    checkSleeping(player.getWorld());
   }
 
-  private void checkSleeping(World world, boolean enteredBed) {
+  @Override
+  public void worldChanged(Player player, World from, World to) {
+    checkSleeping(from);
+    checkSleeping(to);
+  }
+
+  private void checkSleeping(World world) {
     Server srv = this.plugin.getServer();
     CustomCommandSender sender = new CustomCommandSender(srv.getConsoleSender());
     int afkPlayers = 0;
@@ -65,11 +71,12 @@ public class NightSkip implements PlayerSleepEvent, NightSkipEvent {
 
     NightSkipTimer timer = getTimer(world);
     if (resetRequired(world)) {
-      if (neededPlayers > 0 && enteredBed) {
+      // only broadcast the message if we need more people and there are actually people sleeping
+      if (neededPlayers > 0 && sleepingPlayers > 0) {
         this.plugin.getLogger().info("There are " + totalPlayersInWorld + " players in this world. " + sleepingPlayers
             + " are sleeping and " + afkPlayers + " are afk. For skipping the night " + neededPlayers + " are needed.");
         plugin.getServer().broadcastMessage(
-            "Somebody wants to sleep in the " + world.getName() + ". " + neededPlayers + " more players needed.");
+            "Someone wants to sleep in the " + world.getName() + ". " + neededPlayers + " more players needed.");
       } else if (!timer.isRunning()) {
         timer.start();
         plugin.getLogger().info("Starting sleep timer");
