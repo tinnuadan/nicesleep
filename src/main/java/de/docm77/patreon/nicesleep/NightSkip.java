@@ -20,12 +20,16 @@ public class NightSkip implements NightSkipEventHandler, PlayerSleepEventHandler
   private HashSet<Player> playersInBed;
   private HashMap<World, NightSkipTimer> nightSkipTimers;
   private HashMap<World, BossBar> bossbars;
+  private BarColor playerBarColor;
+  private BarColor opBarColor;
 
   public NightSkip(JavaPlugin plugin, Config config) {
     this.plugin = plugin;
     this.neededPercentage = ((double) config.neededPercentage) / 100.;
     this.skipDelay = (int) (Math.round(config.skipDelaySeconds * 1000.0));
     this.opsCanOverride = config.opsCanOverride;
+    this.playerBarColor = config.barColors.get(Config.Bar.Player);
+    this.opBarColor = config.barColors.get(Config.Bar.OP);
     this.nightSkipTimers = new HashMap<World, NightSkipTimer>();
     this.bossbars = new HashMap<World, BossBar>();
 
@@ -110,9 +114,9 @@ public class NightSkip implements NightSkipEventHandler, PlayerSleepEventHandler
         bb.setTitle("Sleeping: " + sleepingPlayers + " out of " + (neededPlayers + sleepingPlayers) + " necessary");
         bb.setProgress(perc);
         if(opsCanOverride && opSleeping) {
-          bb.setColor(BarColor.PINK);
+          bb.setColor(opBarColor);
         } else {
-          bb.setColor(BarColor.BLUE);
+          bb.setColor(playerBarColor);
         }
       } else { 
         removeBossBar(world);
@@ -165,7 +169,7 @@ public class NightSkip implements NightSkipEventHandler, PlayerSleepEventHandler
 
   private BossBar createBossBar(World world, HashSet<Player> playersInWorld) {
     plugin.getLogger().info("Creating bossbar");
-    BossBar bb = plugin.getServer().createBossBar("Sleeping", BarColor.BLUE, BarStyle.SOLID);
+    BossBar bb = plugin.getServer().createBossBar("Sleeping", playerBarColor, BarStyle.SOLID);
     for(Player p : playersInWorld) {
       bb.addPlayer(p);
     }
