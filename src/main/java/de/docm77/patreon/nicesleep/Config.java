@@ -28,7 +28,17 @@ final class Config {
     neededPercentage = Math.min(100, Math.max(0, config.getInt("percentage_needed")));
     skipDelaySeconds = Math.max(0.0, config.getDouble("seconds_before_skip"));
     opsCanOverride = config.getBoolean("ops_can_override");
-    barColors.put(Bar.Player, BarColor.BLUE);
-    barColors.put(Bar.OP, BarColor.PINK);
+    barColors.put(Bar.Player, strToColor(config.getString("barcolor.player"), plugin));
+    barColors.put(Bar.OP, strToColor(config.getString("barcolor.op"), plugin));
+  }
+
+  private BarColor strToColor(String color, JavaPlugin plugin) {
+    BarColor bc = BarColor.WHITE;
+    try {
+      bc = BarColor.valueOf(color.toUpperCase());
+    } catch(IllegalArgumentException e) {
+      plugin.getLogger().warning("Unable to convert " + color + " into a bar color. Falling back to white");
+    }
+    return bc;
   }
 }
