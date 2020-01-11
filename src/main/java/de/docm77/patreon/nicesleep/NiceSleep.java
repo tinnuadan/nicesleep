@@ -16,9 +16,12 @@ public class NiceSleep extends JavaPlugin {
 
   @Override
   public void onEnable() {
-    int percentageNeeded = Math.min(100, Math.max(0, getConfig().getInt("percentage_needed")));
-    double sBeforeSkip = Math.max(0.0, getConfig().getDouble("seconds_before_skip"));
-    nightSkip = new NightSkip(this, percentageNeeded, sBeforeSkip);
+    Config config = new Config();
+    config.neededPercentage = Math.min(100, Math.max(0, getConfig().getInt("percentage_needed")));
+    config.skipDelaySeconds = Math.max(0.0, getConfig().getDouble("seconds_before_skip"));
+    config.opsCanOverride = getConfig().getBoolean("ops_can_override");
+    config.log(this);
+    nightSkip = new NightSkip(this, config);
     bedEventListener = new PlayerBedEventListener(this, nightSkip);
     changedWorldEventListener = new PlayerChangedWorldEventListener(this, nightSkip);
     getLogger().info("NiceSleep enabled!");

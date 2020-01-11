@@ -2,6 +2,9 @@ package de.docm77.patreon.nicesleep;
 
 import org.bukkit.Server;
 import org.bukkit.World;
+import org.bukkit.boss.BarColor;
+import org.bukkit.boss.BarStyle;
+import org.bukkit.boss.BossBar;
 import org.bukkit.command.CommandException;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -13,14 +16,18 @@ public class NightSkip implements NightSkipEventHandler, PlayerSleepEventHandler
   private JavaPlugin plugin;
   private double neededPercentage;
   private int skipDelay;
+  private boolean opsCanOverride;
   private HashSet<Player> playersInBed;
   private HashMap<World, NightSkipTimer> nightSkipTimers;
+  private HashMap<World, BossBar> bossbars;
 
-  public NightSkip(JavaPlugin plugin, int neededPercentage, double secondsBeforeSkip) {
+  public NightSkip(JavaPlugin plugin, Config config) {
     this.plugin = plugin;
-    this.neededPercentage = ((double) neededPercentage) / 100.;
-    this.skipDelay = (int)(Math.round(secondsBeforeSkip * 1000.0));
+    this.neededPercentage = ((double) config.neededPercentage) / 100.;
+    this.skipDelay = (int) (Math.round(config.skipDelaySeconds * 1000.0));
+    this.opsCanOverride = config.opsCanOverride;
     this.nightSkipTimers = new HashMap<World, NightSkipTimer>();
+    this.bossbars = new HashMap<World, BossBar>();
 
     playersInBed = new HashSet<Player>();
   }
@@ -41,6 +48,12 @@ public class NightSkip implements NightSkipEventHandler, PlayerSleepEventHandler
   public void worldChanged(Player player, World from, World to) {
     checkSleeping(from);
     checkSleeping(to);
+    if(hasBossBar(from)) {
+      bossbars.get(from).removePlayer(player);
+    }
+    if(hasBossBar(to))  {
+      bossbars.get(to).addPlayer(player);
+    }
   }
 
   private void checkSleeping(World world) {
@@ -49,6 +62,8 @@ public class NightSkip implements NightSkipEventHandler, PlayerSleepEventHandler
     int afkPlayers = 0;
     int totalPlayersInWorld = 0;
     int sleepingPlayers = 0;
+    HashSet<Player> playersInWorld = new HashSet<Player>();
+    boolean opSleeping = false;
     for (Player p : srv.getOnlinePlayers()) {
       if (p.getWorld() == world) {
         boolean afk = false;
@@ -62,29 +77,52 @@ public class NightSkip implements NightSkipEventHandler, PlayerSleepEventHandler
         }
         if (playersInBed.contains(p)) {
           ++sleepingPlayers;
+          if(p.isOp()) {
+            opSleeping = true;
+          }
         }
         ++totalPlayersInWorld;
+        playersInWorld.add(p);
       }
     }
 
-    int neededPlayers = (int) Math.floor((double) (totalPlayersInWorld - afkPlayers) * neededPercentage);
-    neededPlayers = Math.max(neededPlayers, 1); // we need at least one in total
+    int activePlayers = totalPlayersInWorld - afkPlayers;
+    int neededPlayers = (int) Math.round((double) activePlayers * neededPercentage);
+    neededPlayers = Math.min(activePlayers, Math.max(neededPlayers, 1)); // we need at least one in total
     neededPlayers -= sleepingPlayers;
 
+
+
     NightSkipTimer timer = getTimer(world);
+    boolean skipTheNight = neededPlayers <= 0 && (opsCanOverride && opSleeping);
     if (resetRequired(world)) {
-      // only broadcast the message if we need more people and there are actually people sleeping
-      if (neededPlayers > 0 && sleepingPlayers > 0) {
-        this.plugin.getLogger().info("There are " + totalPlayersInWorld + " players in this world. " + sleepingPlayers
-            + " are sleeping and " + afkPlayers + " are afk. For skipping the night " + neededPlayers + " are needed.");
-        plugin.getServer().broadcastMessage(
-            "Someone wants to sleep in the " + world.getName() + ". " + neededPlayers + " more players needed.");
-      } else if (!timer.isRunning()) {
+      this.plugin.getLogger().info("There are " + totalPlayersInWorld + " players in this world. " + sleepingPlayers
+          + " are sleeping and " + afkPlayers + " are afk. For skipping the night " + neededPlayers + " are needed.");
+      // only broadcast the message if we need more people and there are actually
+      // people sleeping
+      if(sleepingPlayers > 0) {
+        int playersUsedForCalculation = Math.max(neededPlayers, 0) + sleepingPlayers;
+        double perc = Math.min(100., (double) sleepingPlayers / (double) playersUsedForCalculation);
+        if(!hasBossBar(world)) {
+          createBossBar(world, playersInWorld);
+        }
+        BossBar bb = bossbars.get(world);
+        bb.setTitle("Sleeping: " + sleepingPlayers + " out of " + (neededPlayers + sleepingPlayers) + " necessary");
+        bb.setProgress(perc);
+        if(opsCanOverride && opSleeping) {
+          bb.setColor(BarColor.PINK);
+        } else {
+          bb.setColor(BarColor.BLUE);
+        }
+      } else { 
+        removeBossBar(world);
+      }
+      if(skipTheNight && !timer.isRunning()) {
         timer.start();
         plugin.getLogger().info("Starting sleep timer");
       }
     }
-    if (neededPlayers > 0 && timer.isRunning()) {
+    if (!skipTheNight && timer.isRunning()) {
       plugin.getLogger().info("Cancelling sleep timer");
       timer.stop();
     }
@@ -108,6 +146,7 @@ public class NightSkip implements NightSkipEventHandler, PlayerSleepEventHandler
   @Override
   public void nightSkipped(World world) {
     plugin.getLogger().info("Night skip requested");
+    removeBossBar(world);
     if (resetRequired(world)) {
       resetDay(world);
     }
@@ -118,6 +157,28 @@ public class NightSkip implements NightSkipEventHandler, PlayerSleepEventHandler
       nightSkipTimers.put(world, new NightSkipTimer(world, skipDelay, this));
     }
     return nightSkipTimers.get(world);
+  }
+
+  private boolean hasBossBar(World world) {
+    return bossbars.containsKey(world);
+  }
+
+  private BossBar createBossBar(World world, HashSet<Player> playersInWorld) {
+    plugin.getLogger().info("Creating bossbar");
+    BossBar bb = plugin.getServer().createBossBar("Sleeping", BarColor.BLUE, BarStyle.SOLID);
+    for(Player p : playersInWorld) {
+      bb.addPlayer(p);
+    }
+    bossbars.put(world, bb);
+    return bb;
+  }
+
+  private void removeBossBar(World world) {
+    if(hasBossBar(world)) {
+      plugin.getLogger().info("Removing bossbar");
+      bossbars.get(world).removeAll();
+      bossbars.remove(world);
+    }
   }
 
 }

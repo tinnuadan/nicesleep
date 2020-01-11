@@ -7,3 +7,6 @@ percentage_needed: 0
 #how long the plugin waits once a suffient number of players is in bed before skipping the night
 #note that 5.05 seconds is the vanilla waiting period
 seconds_before_skip: 5.0
+
+#if set to true ops can skip the night no matter how many people are needed
+ops_can_override: true
