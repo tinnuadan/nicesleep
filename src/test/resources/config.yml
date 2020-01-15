@@ -1,0 +1,20 @@
+#config for NiceSleep
+
+#percentage of not-afk players needed to skip the night (0 - 100).
+#0 means that any player can skip the night on their own
+percentage_needed: 55
+
+#how long the plugin waits once a suffient number of players is in bed before skipping the night
+#note that 5.05 seconds is the vanilla waiting period
+seconds_before_skip: 4.1
+
+#if set to true ops can skip the night no matter how many people are needed
+ops_can_override: true
+
+#the color of the sleeping bar.
+#you can choose a different color to indicate when an op sleeps and they can skip the night in any case
+#colors are from org.bukkit.boss.BarColor:
+#BLUE, GREEN, PINK, PURPLE, RED, WHITE, YELLOW
+barcolor:
+  player: BLUE
+  op: PINK

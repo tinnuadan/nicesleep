@@ -16,9 +16,9 @@ public class NiceSleep extends JavaPlugin {
 
   @Override
   public void onEnable() {
-    Config config = new Config();
-    config.load(this);
-    config.log(this);
+    Config config = new Config(this.getConfig(), this.getLogger());
+    config.load();
+    config.log();
     nightSkip = new NightSkip(this, config);
     bedEventListener = new PlayerBedEventListener(this, nightSkip);
     changedWorldEventListener = new PlayerChangedWorldEventListener(this, nightSkip);
