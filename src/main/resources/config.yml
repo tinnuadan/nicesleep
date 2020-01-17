@@ -4,6 +4,11 @@
 #0 means that any player can skip the night on their own
 percentage_needed: 0
 
+#rounding method for determining how many players are needed to skip the night.
+#values determined from java.math.RoundingMode:
+#UP, DOWN, CEILING, FLOOR, HALF_UP, HALF_DOWN, HALF_EVEN. UNNECESSARY is not allowed
+rounding_method: HALF_UP
+
 #how long the plugin waits once a suffient number of players is in bed before skipping the night
 #note that 5.05 seconds is the vanilla waiting period
 seconds_before_skip: 4.0
