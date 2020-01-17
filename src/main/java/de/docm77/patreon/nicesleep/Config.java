@@ -35,8 +35,8 @@ public final class Config {
     logger.info("\trounding_method: " + roundingMethod);
     logger.info("\tseconds_before_skip: " + skipDelaySeconds);
     logger.info("\tops_can_override: " + opsCanOverride);
-    logger.info("\barcolor.player: " + barColors.get(Bar.Player));
-    logger.info("\barcolor.op: " + barColors.get(Bar.OP));
+    logger.info("\tbarcolor.player: " + barColors.get(Bar.Player));
+    logger.info("\tbarcolor.op: " + barColors.get(Bar.OP));
   }
 
   public void load() {
@@ -76,7 +76,7 @@ public final class Config {
     } catch (IllegalArgumentException e) {
       logger.warning("Unable to convert " + method + " into a rounding method. Falling back to 'HALF_UP'");
     }
-    if(res == RoundingMode.UNNECESSARY) {
+    if (res == RoundingMode.UNNECESSARY) {
       logger.warning("Rounding mode 'UNNECESSARY' is not allowed. Falling back to 'HALF_UP'");
       res = RoundingMode.HALF_UP;
     }
@@ -89,7 +89,7 @@ public final class Config {
       logger.info("Config for " + path + " not found, using default value (" + def + ")");
       return def;
     }
-    if(!cl.isInstance(obj)) {
+    if (!cl.isInstance(obj)) {
       logger.warning("Unable to cast " + path + " to " + cl + ", returning default value");
       return def;
     }
