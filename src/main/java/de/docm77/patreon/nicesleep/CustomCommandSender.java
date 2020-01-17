@@ -5,8 +5,6 @@ import java.util.Set;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.conversations.Conversation;
 import org.bukkit.conversations.ConversationAbandonedEvent;
-import org.bukkit.conversations.ManuallyAbandonedConversationCanceller;
-import org.bukkit.permissions.PermissibleBase;
 import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionAttachment;
 import org.bukkit.permissions.PermissionAttachmentInfo;
@@ -26,7 +24,6 @@ public class CustomCommandSender implements ConsoleCommandSender {
 
   @Override
   public void sendMessage(String message) {
-    this.sender.getServer().getLogger().info("Sending msg: " + message);
     this.lastMessage = message;
     this.sender.sendMessage(message);
   }
@@ -34,7 +31,6 @@ public class CustomCommandSender implements ConsoleCommandSender {
   @Override
   public void sendMessage(String[] messages) {
     this.lastMessage = String.join(" ", messages);
-    this.sender.getServer().getLogger().info("Sending msgs: " + String.join(" ", messages));
     this.sender.sendMessage(messages);
   }
 
@@ -147,7 +143,6 @@ public class CustomCommandSender implements ConsoleCommandSender {
   @Override
   public void sendRawMessage(String message) {
     lastMessage = message;
-    this.sender.getServer().getLogger().info("Sending raw msg: " + message);
     sender.sendRawMessage(message);
   }
 }

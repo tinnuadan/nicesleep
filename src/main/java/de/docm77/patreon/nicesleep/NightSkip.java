@@ -10,12 +10,14 @@ import org.bukkit.command.CommandException;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import java.util.HashSet;
+import java.math.RoundingMode;
 import java.util.HashMap;
 
 public class NightSkip implements NightSkipEventHandler, PlayerSleepEventHandler, PlayerWorldChangeEventHandler {
 
   private JavaPlugin plugin;
   private double neededPercentage;
+  private RoundingMode roundingMethod;
   private int skipDelay;
   private boolean opsCanOverride;
   private HashSet<Player> playersInBed;
@@ -27,6 +29,7 @@ public class NightSkip implements NightSkipEventHandler, PlayerSleepEventHandler
   public NightSkip(JavaPlugin plugin, Config config) {
     this.plugin = plugin;
     this.neededPercentage = ((double) config.neededPercentage) / 100.;
+    this.roundingMethod = config.roundingMethod;
     this.skipDelay = (int) (Math.round(config.skipDelaySeconds * 1000.0));
     this.opsCanOverride = config.opsCanOverride;
     this.playerBarColor = config.barColors.get(Config.Bar.Player);
@@ -69,6 +72,8 @@ public class NightSkip implements NightSkipEventHandler, PlayerSleepEventHandler
     int sleepingPlayers = 0;
     HashSet<Player> playersInWorld = new HashSet<Player>();
     boolean opSleeping = false;
+
+    // get players in world and count afk players
     for (Player p : srv.getOnlinePlayers()) {
       if (p.getWorld() == world) {
         boolean afk = false;
@@ -91,24 +96,24 @@ public class NightSkip implements NightSkipEventHandler, PlayerSleepEventHandler
       }
     }
 
-    int activePlayers = totalPlayersInWorld - afkPlayers;
-    int neededPlayers = (int) Math.round((double) activePlayers * neededPercentage);
-    neededPlayers = Math.min(activePlayers, Math.max(neededPlayers, 1)); // we need at least one in total
-    neededPlayers -= sleepingPlayers;
+    final int activePlayers = totalPlayersInWorld - afkPlayers;
+    int totalNeededPlayers = Utils.Round(((double) activePlayers) * neededPercentage, roundingMethod);
+    totalNeededPlayers = Math.min(activePlayers, Math.max(totalNeededPlayers, 1)); // we need at least one in total
+    final int neededPlayers = totalNeededPlayers - sleepingPlayers;
 
     NightSkipTimer timer = getTimer(world);
-    boolean skipTheNight = neededPlayers <= 0 || (opsCanOverride && opSleeping);
+    final boolean skipTheNight = neededPlayers <= 0 || (opsCanOverride && opSleeping);
     if (resetRequired(world)) {
       // only broadcast the message if we need more people and there are actually
       // people sleeping
       if (sleepingPlayers > 0) {
-        int playersUsedForCalculation = Math.max(neededPlayers, 0) + sleepingPlayers;
-        double perc = Math.min(100., (double) sleepingPlayers / (double) playersUsedForCalculation);
+        final int playersUsedForCalculation = Math.max(neededPlayers, 0) + sleepingPlayers;
+        final double perc = Math.min(100., (double) sleepingPlayers / (double) playersUsedForCalculation);
         if (!hasBossBar(world)) {
           createBossBar(world, playersInWorld);
         }
         BossBar bb = bossbars.get(world);
-        bb.setTitle("Sleeping: " + sleepingPlayers + " out of " + (neededPlayers + sleepingPlayers) + " necessary");
+        bb.setTitle("Sleeping: " + sleepingPlayers + " out of " + totalNeededPlayers + " necessary");
         bb.setProgress(perc);
         if (opsCanOverride && opSleeping) {
           bb.setColor(opBarColor);
@@ -122,7 +127,7 @@ public class NightSkip implements NightSkipEventHandler, PlayerSleepEventHandler
     plugin.getLogger().info("Status:");
     plugin.getLogger().info("\tTotal players in the world: " + totalPlayersInWorld);
     plugin.getLogger().info("\tSleeping players: " + sleepingPlayers);
-    plugin.getLogger().info("\tNeeded players for skipping: " + neededPlayers + sleepingPlayers);
+    plugin.getLogger().info("\tTotal needed players for skipping: " + totalNeededPlayers);
     plugin.getLogger().info("\tTimer running:" + timer.isRunning());
     plugin.getLogger().info("\tSkip the night:" + skipTheNight);
     if (skipTheNight && !timer.isRunning()) {
@@ -181,6 +186,7 @@ public class NightSkip implements NightSkipEventHandler, PlayerSleepEventHandler
   private BossBar createBossBar(World world, HashSet<Player> playersInWorld) {
     plugin.getLogger().info("Creating bossbar");
     BossBar bb = plugin.getServer().createBossBar("Sleeping", playerBarColor, BarStyle.SOLID);
+    bb.setProgress(0);
     for (Player p : playersInWorld) {
       bb.addPlayer(p);
     }

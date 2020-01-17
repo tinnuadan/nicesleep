@@ -18,12 +18,6 @@ public class PlayerBedEventListener implements Listener {
     this.sleepEventHandler = handler;
 
     this.plugin.getServer().getPluginManager().registerEvents(this, this.plugin);
-    this.plugin.getLogger().info("PlayerBedEventListener created");
-  }
-
-  @Override
-  public void finalize() {
-    System.out.println("PlayerBedEventListener instance is getting destroyed");
   }
 
   @EventHandler

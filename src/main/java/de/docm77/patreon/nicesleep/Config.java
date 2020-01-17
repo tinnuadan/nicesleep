@@ -1,12 +1,12 @@
 package de.docm77.patreon.nicesleep;
 
 import java.lang.Class;
+import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.logging.Logger;
 
 import org.bukkit.boss.BarColor;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.plugin.java.JavaPlugin;
 
 public final class Config {
   public enum Bar {
@@ -18,6 +18,7 @@ public final class Config {
   public int neededPercentage = 0;
   public double skipDelaySeconds = 0.0;
   public boolean opsCanOverride = false;
+  public RoundingMode roundingMethod = RoundingMode.HALF_UP;
   public HashMap<Bar, BarColor> barColors;
 
   public Config(FileConfiguration config, Logger logger) {
@@ -31,11 +32,16 @@ public final class Config {
   public void log() {
     logger.info("Settings:");
     logger.info("\tpercentage_needed: " + neededPercentage);
+    logger.info("\trounding_method: " + roundingMethod);
     logger.info("\tseconds_before_skip: " + skipDelaySeconds);
     logger.info("\tops_can_override: " + opsCanOverride);
+    logger.info("\tbarcolor.player: " + barColors.get(Bar.Player));
+    logger.info("\tbarcolor.op: " + barColors.get(Bar.OP));
   }
 
   public void load() {
+    String tmp;
+
     neededPercentage = loadValue("percentage_needed", Integer.class, 0);
     neededPercentage = Math.min(100, Math.max(0, neededPercentage));
 
@@ -44,7 +50,9 @@ public final class Config {
 
     opsCanOverride = loadValue("ops_can_override", Boolean.class, false);
 
-    String tmp;
+    tmp = loadValue("rounding_method", String.class, "ROUND");
+    roundingMethod = strToRoundingMode(tmp);
+
     tmp = loadValue("barcolor.player", String.class, "WHITE");
     barColors.put(Bar.Player, strToColor(tmp));
     tmp = loadValue("barcolor.op", String.class, "WHITE");
@@ -61,13 +69,27 @@ public final class Config {
     return bc;
   }
 
+  private RoundingMode strToRoundingMode(String method) {
+    RoundingMode res = RoundingMode.HALF_UP;
+    try {
+      res = RoundingMode.valueOf(method.toUpperCase());
+    } catch (IllegalArgumentException e) {
+      logger.warning("Unable to convert " + method + " into a rounding method. Falling back to 'HALF_UP'");
+    }
+    if (res == RoundingMode.UNNECESSARY) {
+      logger.warning("Rounding mode 'UNNECESSARY' is not allowed. Falling back to 'HALF_UP'");
+      res = RoundingMode.HALF_UP;
+    }
+    return res;
+  }
+
   private <T> T loadValue(String path, Class<T> cl, T def) {
     Object obj = config.get(path, null);
     if (obj == null) {
       logger.info("Config for " + path + " not found, using default value (" + def + ")");
       return def;
     }
-    if(!cl.isInstance(obj)) {
+    if (!cl.isInstance(obj)) {
       logger.warning("Unable to cast " + path + " to " + cl + ", returning default value");
       return def;
     }
