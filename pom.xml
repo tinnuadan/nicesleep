@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>de.docm77.patreon.nicesleep</groupId>
     <artifactId>NiceSleep</artifactId>
-    <version>1.15.1-RO.1-1.0-SNAPSHOT</version>
+    <version>RO.1-SNAPSHOT-1.15.1</version>
 
     <repositories>
         <repository>
