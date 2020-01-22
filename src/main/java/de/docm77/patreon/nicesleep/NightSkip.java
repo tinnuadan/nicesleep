@@ -120,9 +120,10 @@ public class NightSkip implements NightSkipEventHandler, PlayerSleepEventHandler
         } else {
           bb.setColor(playerBarColor);
         }
-      } else {
-        removeBossBar(world);
       }
+    }
+    if(sleepingPlayers == 0 && hasBossBar(world)) {
+      removeBossBar(world);
     }
     plugin.getLogger().fine("Status:");
     plugin.getLogger().fine("\tTotal players in the world: " + totalPlayersInWorld);
