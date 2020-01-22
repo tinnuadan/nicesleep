@@ -124,24 +124,24 @@ public class NightSkip implements NightSkipEventHandler, PlayerSleepEventHandler
         removeBossBar(world);
       }
     }
-    plugin.getLogger().info("Status:");
-    plugin.getLogger().info("\tTotal players in the world: " + totalPlayersInWorld);
-    plugin.getLogger().info("\tSleeping players: " + sleepingPlayers);
-    plugin.getLogger().info("\tTotal needed players for skipping: " + totalNeededPlayers);
-    plugin.getLogger().info("\tTimer running:" + timer.isRunning());
-    plugin.getLogger().info("\tSkip the night:" + skipTheNight);
+    plugin.getLogger().fine("Status:");
+    plugin.getLogger().fine("\tTotal players in the world: " + totalPlayersInWorld);
+    plugin.getLogger().fine("\tSleeping players: " + sleepingPlayers);
+    plugin.getLogger().fine("\tTotal needed players for skipping: " + totalNeededPlayers);
+    plugin.getLogger().fine("\tTimer running:" + timer.isRunning());
+    plugin.getLogger().fine("\tSkip the night:" + skipTheNight);
     if (skipTheNight && !timer.isRunning()) {
       timer.start();
-      plugin.getLogger().info("Starting sleep timer");
+      plugin.getLogger().fine("Starting sleep timer");
     }
     if (!skipTheNight && timer.isRunning()) {
-      plugin.getLogger().info("Cancelling sleep timer");
+      plugin.getLogger().fine("Cancelling sleep timer");
       timer.stop();
     }
   }
 
   public void resetDay(World world) {
-    plugin.getLogger().info("Reset to day");
+    plugin.getLogger().fine("Reset to day");
     world.setTime(0);
     world.setStorm(false);
     world.setThundering(false);
@@ -158,7 +158,7 @@ public class NightSkip implements NightSkipEventHandler, PlayerSleepEventHandler
 
   @Override
   public void nightSkipped(World world) {
-    plugin.getLogger().info("Night skip requested");
+    plugin.getLogger().fine("Night skip requested");
     Bukkit.getScheduler().runTask(plugin, new Runnable() {
       // the weather clearing must be run in the main thread
       @Override
@@ -184,7 +184,7 @@ public class NightSkip implements NightSkipEventHandler, PlayerSleepEventHandler
   }
 
   private BossBar createBossBar(World world, HashSet<Player> playersInWorld) {
-    plugin.getLogger().info("Creating bossbar");
+    plugin.getLogger().fine("Creating bossbar");
     BossBar bb = plugin.getServer().createBossBar("Sleeping", playerBarColor, BarStyle.SOLID);
     bb.setProgress(0);
     for (Player p : playersInWorld) {
@@ -196,7 +196,7 @@ public class NightSkip implements NightSkipEventHandler, PlayerSleepEventHandler
 
   private void removeBossBar(World world) {
     if (hasBossBar(world)) {
-      plugin.getLogger().info("Removing bossbar");
+      plugin.getLogger().fine("Removing bossbar");
       bossbars.get(world).removeAll();
       bossbars.remove(world);
     }
