@@ -50,7 +50,7 @@ public final class Config {
 
     opsCanOverride = loadValue("ops_can_override", Boolean.class, false);
 
-    tmp = loadValue("rounding_method", String.class, "ROUND");
+    tmp = loadValue("rounding_method", String.class, "HALF_UP");
     roundingMethod = strToRoundingMode(tmp);
 
     tmp = loadValue("barcolor.player", String.class, "WHITE");

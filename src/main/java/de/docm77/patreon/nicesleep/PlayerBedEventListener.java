@@ -24,7 +24,7 @@ public class PlayerBedEventListener implements Listener {
   void onPlayerBedEnter(PlayerBedEnterEvent event) {
     if (event.getBedEnterResult() == BedEnterResult.OK) {
       Player player = event.getPlayer();
-      this.plugin.getLogger().info(player.getDisplayName() + " went to bed");
+      this.plugin.getLogger().fine(player.getDisplayName() + " went to bed");
       sleepEventHandler.playerEnteredBed(player);
     }
   }
@@ -32,7 +32,7 @@ public class PlayerBedEventListener implements Listener {
   @EventHandler
   void onPlayerBedLeave(PlayerBedLeaveEvent event) {
     Player player = event.getPlayer();
-    this.plugin.getLogger().info(player.getDisplayName() + " left the bed");
+    this.plugin.getLogger().fine(player.getDisplayName() + " left the bed");
     sleepEventHandler.playerLeftBed(player);
   }
 
