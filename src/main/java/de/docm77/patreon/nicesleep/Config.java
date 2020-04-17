@@ -16,6 +16,7 @@ public final class Config {
   private FileConfiguration config;
   private Logger logger;
   public int neededPercentage = 0;
+  public int maxPlayersNeeded = 0;
   public double skipDelaySeconds = 0.0;
   public boolean opsCanOverride = false;
   public RoundingMode roundingMethod = RoundingMode.HALF_UP;
@@ -32,6 +33,7 @@ public final class Config {
   public void log() {
     logger.info("Settings:");
     logger.info("\tpercentage_needed: " + neededPercentage);
+    logger.info("\tmax_players: " + maxPlayersNeeded);
     logger.info("\trounding_method: " + roundingMethod);
     logger.info("\tseconds_before_skip: " + skipDelaySeconds);
     logger.info("\tops_can_override: " + opsCanOverride);
@@ -44,6 +46,9 @@ public final class Config {
 
     neededPercentage = loadValue("percentage_needed", Integer.class, 0);
     neededPercentage = Math.min(100, Math.max(0, neededPercentage));
+
+    maxPlayersNeeded = loadValue("max_players", Integer.class, 0);
+    maxPlayersNeeded = Math.max(maxPlayersNeeded, 0);
 
     skipDelaySeconds = loadValue("seconds_before_skip", Double.class, 4.0);
     skipDelaySeconds = Math.min(15., Math.max(0., skipDelaySeconds));

@@ -4,6 +4,9 @@
 #0 means that any player can skip the night on their own
 percentage_needed: 0
 
+#if not set to zero it will cap the amount of players needed to skip the night
+max_players: 0
+
 #rounding method for determining how many players are needed to skip the night.
 #values determined from java.math.RoundingMode:
 #UP, DOWN, CEILING, FLOOR, HALF_UP, HALF_DOWN, HALF_EVEN. UNNECESSARY is not allowed

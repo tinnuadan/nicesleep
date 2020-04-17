@@ -17,6 +17,7 @@ public class NightSkip implements NightSkipEventHandler, PlayerSleepEventHandler
 
   private JavaPlugin plugin;
   private double neededPercentage;
+  private int maxPlayersNeeded;
   private RoundingMode roundingMethod;
   private int skipDelay;
   private boolean opsCanOverride;
@@ -29,6 +30,7 @@ public class NightSkip implements NightSkipEventHandler, PlayerSleepEventHandler
   public NightSkip(JavaPlugin plugin, Config config) {
     this.plugin = plugin;
     this.neededPercentage = ((double) config.neededPercentage) / 100.;
+    this.maxPlayersNeeded = config.maxPlayersNeeded;
     this.roundingMethod = config.roundingMethod;
     this.skipDelay = (int) (Math.round(config.skipDelaySeconds * 1000.0));
     this.opsCanOverride = config.opsCanOverride;
@@ -99,6 +101,9 @@ public class NightSkip implements NightSkipEventHandler, PlayerSleepEventHandler
     final int activePlayers = totalPlayersInWorld - afkPlayers;
     int totalNeededPlayers = Utils.Round(((double) activePlayers) * neededPercentage, roundingMethod);
     totalNeededPlayers = Math.min(activePlayers, Math.max(totalNeededPlayers, 1)); // we need at least one in total
+    if(maxPlayersNeeded > 0) { // if a limit is set
+      totalNeededPlayers = Math.min(totalNeededPlayers, maxPlayersNeeded); 
+    }
     final int neededPlayers = totalNeededPlayers - sleepingPlayers;
 
     NightSkipTimer timer = getTimer(world);
