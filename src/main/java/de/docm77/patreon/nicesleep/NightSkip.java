@@ -55,13 +55,13 @@ public class NightSkip implements NightSkipEventHandler, PlayerSleepEventHandler
 
   private void checkSleeping(World world) {
     // get settings
-    final double neededPercentage = ((double) config.neededPercentage) / 100.;
-    final int maxPlayersNeeded = config.maxPlayersNeeded;
-    final RoundingMode roundingMethod = config.roundingMethod;
-    final int skipDelay = (int) (Math.round(config.skipDelaySeconds * 1000.0));
-    final boolean opsCanOverride = config.opsCanOverride;
-    final  BarColor playerBarColor = config.barColors.get(Config.Bar.Player);
-    final BarColor opBarColor = config.barColors.get(Config.Bar.OP);
+    final double neededPercentage = ((double) config.neededPercentage()) / 100.;
+    final int maxPlayersNeeded = config.maxPlayersNeeded();
+    final RoundingMode roundingMethod = config.roundingMethod();
+    final int skipDelay = (int) (Math.round(config.skipDelaySeconds() * 1000.0));
+    final boolean opsCanOverride = config.opsCanOverride();
+    final  BarColor playerBarColor = config.barColor(Config.Bar.Player);
+    final BarColor opBarColor = config.barColor(Config.Bar.OP);
 
     // initialize vars
     Server srv = this.plugin.getServer();
