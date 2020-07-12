@@ -79,7 +79,8 @@ public class NightSkip implements NightSkipEventHandler, PlayerSleepEventHandler
         boolean afk = false;
         try {
           srv.dispatchCommand(sender, "afkcheck " + p.getDisplayName());
-          afk = !sender.lastMessage.toLowerCase().contains("playing");
+          final String msg = sender.lastMessage.toLowerCase();
+          afk = !msg.contains("unknown command") && !msg.contains("playing");
         } catch (CommandException e) {
         }
         if (afk) {
@@ -98,7 +99,7 @@ public class NightSkip implements NightSkipEventHandler, PlayerSleepEventHandler
 
     final int activePlayers = totalPlayersInWorld - afkPlayers;
     int totalNeededPlayers = Utils.Round(((double) activePlayers) * neededPercentage, roundingMethod);
-    totalNeededPlayers = Math.min(activePlayers, Math.max(totalNeededPlayers, 1)); // we need at least one in total
+    totalNeededPlayers = Math.max(Math.min(activePlayers, totalNeededPlayers), 1); // we need at least one in total and no more than active players
     final int neededPlayers = totalNeededPlayers - sleepingPlayers;
 
     NightSkipTimer timer = getTimer(world);
