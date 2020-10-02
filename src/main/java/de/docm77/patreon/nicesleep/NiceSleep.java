@@ -20,6 +20,7 @@ public class NiceSleep extends BasePlugin {
 
   @Override
   public void onEnable() {
+    this.saveDefaultConfig();
     // default implentation of the logger
     Config config = new Config(this.getConfig(), this.getLogger());
     config.load();
