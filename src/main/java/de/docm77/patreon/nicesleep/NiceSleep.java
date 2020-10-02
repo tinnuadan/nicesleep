@@ -7,6 +7,7 @@ public class NiceSleep extends BasePlugin {
   private PlayerBedEventListener bedEventListener;
   private PlayerChangedWorldEventListener changedWorldEventListener;
   private NightSkip nightSkip;
+  private DebugCmd debugCmd;
   private LoggerUtil loggerUtil;
 
   public NiceSleep() {
@@ -25,6 +26,8 @@ public class NiceSleep extends BasePlugin {
     config.log();
 
     this.loggerUtil = new LoggerUtil(this);
+    debugCmd = new DebugCmd(this.loggerUtil);
+    this.getCommand("debug").setExecutor(debugCmd);
     nightSkip = new NightSkip(this, config);
     bedEventListener = new PlayerBedEventListener(this, nightSkip);
     changedWorldEventListener = new PlayerChangedWorldEventListener(this, nightSkip);

@@ -3,3 +3,8 @@ name: NiceSleep
 version: 1.0
 author: tinnuadan@gmail.com
 description: Nice Sleep Plugin
+commands:
+  debug:
+    description: Enables or disables fine logging
+    usage: /debug [on|off]
+    permission: nicesleep.debug
