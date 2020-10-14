@@ -1,6 +1,7 @@
 package de.docm77.patreon.nicesleep;
 
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.boss.BarColor;
@@ -86,7 +87,7 @@ public class NightSkip implements NightSkipEventHandler, PlayerSleepEventHandler
         }
         catch (CommandException ignored) {}
 
-        if (afk.get()) {
+        if (afk.get() || p.getGameMode() == GameMode.CREATIVE || p.getGameMode() == GameMode.SPECTATOR) {
           ++afkPlayers;
         }
         if (playersInBed.contains(p)) {
