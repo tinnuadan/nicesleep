@@ -13,8 +13,8 @@ public final class Config {
     Player, OP
   }
 
-  private FileConfiguration config;
-  private Logger logger;
+  private final FileConfiguration config;
+  private final Logger logger;
   public int neededPercentage = 0;
   public double skipDelaySeconds = 0.0;
   public boolean opsCanOverride = false;

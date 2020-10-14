@@ -9,9 +9,9 @@ import java.awt.event.ActionListener;
 
 public class NightSkipTimer implements ActionListener {
 
-  private World world;
-  private Timer timer;
-  private NightSkipEventHandler skipEventHandler;
+  private final World world;
+  private final Timer timer;
+  private final NightSkipEventHandler skipEventHandler;
 
   NightSkipTimer(World world, int delay, NightSkipEventHandler skipEvent) {
     this.world = world;

@@ -10,8 +10,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class PlayerBedEventListener implements Listener {
 
-  BasePlugin plugin;
-  PlayerSleepEventHandler sleepEventHandler;
+  private final BasePlugin plugin;
+  private final PlayerSleepEventHandler sleepEventHandler;
 
   public PlayerBedEventListener(BasePlugin plugin, PlayerSleepEventHandler handler) {
     this.plugin = plugin;

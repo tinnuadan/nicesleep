@@ -6,9 +6,9 @@ import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 class PlayerChangedWorldEventListener implements Listener {
-  
-  JavaPlugin plugin;
-  PlayerWorldChangeEventHandler worldChangeHandler;
+
+  private final JavaPlugin plugin;
+  private final PlayerWorldChangeEventHandler worldChangeHandler;
 
   public PlayerChangedWorldEventListener(JavaPlugin plugin, PlayerWorldChangeEventHandler handler) {
     this.plugin = plugin;
