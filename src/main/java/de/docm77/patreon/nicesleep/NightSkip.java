@@ -13,6 +13,7 @@ import org.bukkit.entity.Player;
 import java.util.HashSet;
 import java.math.RoundingMode;
 import java.util.HashMap;
+import java.util.Vector;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class NightSkip implements NightSkipEventHandler, PlayerSleepEventHandler, PlayerWorldChangeEventHandler
@@ -23,6 +24,7 @@ public class NightSkip implements NightSkipEventHandler, PlayerSleepEventHandler
   private final RoundingMode roundingMethod;
   private final int skipDelay;
   private final boolean opsCanOverride;
+  private final boolean blame;
   private final HashSet<Player> playersInBed;
   private final HashMap<World, NightSkipTimer> nightSkipTimers;
   private final HashMap<World, BossBar> bossBars;
@@ -35,6 +37,7 @@ public class NightSkip implements NightSkipEventHandler, PlayerSleepEventHandler
     this.roundingMethod = config.roundingMethod;
     this.skipDelay = (int) (Math.round(config.skipDelaySeconds * 1000.0));
     this.opsCanOverride = config.opsCanOverride;
+    this.blame = true;
     this.playerBarColor = config.barColors.get(Config.Bar.Player);
     this.opBarColor = config.barColors.get(Config.Bar.OP);
     this.nightSkipTimers = new HashMap<World, NightSkipTimer>();
@@ -166,6 +169,8 @@ public class NightSkip implements NightSkipEventHandler, PlayerSleepEventHandler
   @Override
   public void nightSkipped(World world) {
     plugin.logger().fine("Night skip requested");
+    // collect the blame messages before the skip so that people are still in bed
+    final Vector<String> sleepMessages = collectSleepMessages(world);
     Bukkit.getScheduler().runTask(plugin, new Runnable()
     {
       // the weather clearing must be run in the main thread
@@ -175,9 +180,40 @@ public class NightSkip implements NightSkipEventHandler, PlayerSleepEventHandler
         removeTimer(world);
         if (resetRequired(world)) {
           resetDay(world);
+          blame(world, sleepMessages);
         }
       }
     });
+  }
+
+  private Vector<String> collectSleepMessages(World world)
+  {
+    Vector<String> sleepers = new Vector<String>();
+    if(this.blame)
+    {
+      for(Player p : playersInBed)
+      {
+        if(p.getWorld() == world)
+        {
+          sleepers.add(String.format("§6%s§e went to bed. Sweet Dreams.", p.getDisplayName()));
+        }
+      }
+    }
+    return sleepers;
+  }
+
+  private void blame(World world, Vector<String> sleepMessages) {
+    if(!this.blame)
+    {
+      return;
+    }
+    for(Player p : world.getPlayers())
+    {
+      for(String msg : sleepMessages)
+      {
+        p.sendMessage(msg);
+      }
+    }
   }
 
   private NightSkipTimer getTimer(World world) {
