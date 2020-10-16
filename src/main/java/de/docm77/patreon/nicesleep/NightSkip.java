@@ -37,7 +37,7 @@ public class NightSkip implements NightSkipEventHandler, PlayerSleepEventHandler
     this.roundingMethod = config.roundingMethod;
     this.skipDelay = (int) (Math.round(config.skipDelaySeconds * 1000.0));
     this.opsCanOverride = config.opsCanOverride;
-    this.blame = true;
+    this.blame = config.blame;
     this.playerBarColor = config.barColors.get(Config.Bar.Player);
     this.opBarColor = config.barColors.get(Config.Bar.OP);
     this.nightSkipTimers = new HashMap<World, NightSkipTimer>();

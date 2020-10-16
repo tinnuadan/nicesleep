@@ -18,6 +18,7 @@ public final class Config {
   public int neededPercentage = 0;
   public double skipDelaySeconds = 0.0;
   public boolean opsCanOverride = false;
+  public boolean blame = true;
   public RoundingMode roundingMethod = RoundingMode.HALF_UP;
   public HashMap<Bar, BarColor> barColors;
 
@@ -35,6 +36,7 @@ public final class Config {
     logger.info("\trounding_method: " + roundingMethod);
     logger.info("\tseconds_before_skip: " + skipDelaySeconds);
     logger.info("\tops_can_override: " + opsCanOverride);
+    logger.info("\tblame: " + blame);
     logger.info("\tbarcolor.player: " + barColors.get(Bar.Player));
     logger.info("\tbarcolor.op: " + barColors.get(Bar.OP));
   }
@@ -49,6 +51,8 @@ public final class Config {
     skipDelaySeconds = Math.min(15., Math.max(0., skipDelaySeconds));
 
     opsCanOverride = loadValue("ops_can_override", Boolean.class, false);
+
+    blame = loadValue("blame", Boolean.class, true);
 
     tmp = loadValue("rounding_method", String.class, "HALF_UP");
     roundingMethod = strToRoundingMode(tmp);

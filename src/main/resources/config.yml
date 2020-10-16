@@ -9,12 +9,16 @@ percentage_needed: 0
 #UP, DOWN, CEILING, FLOOR, HALF_UP, HALF_DOWN, HALF_EVEN. UNNECESSARY is not allowed
 rounding_method: HALF_UP
 
-#how long the plugin waits once a suffient number of players is in bed before skipping the night
+#how long the plugin waits once a sufficient number of players is in bed before skipping the night
 #note that 5.05 seconds is the vanilla waiting period
 seconds_before_skip: 4.0
 
 #if set to true ops can skip the night no matter how many people are needed
 ops_can_override: true
+
+#if set to true sleep messages will be shown
+#i.e. "<name> went to bed. Sweet Dreams"
+blame: true
 
 #the color of the sleeping bar.
 #you can choose a different color to indicate when an op sleeps and they can skip the night in any case
