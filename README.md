@@ -27,6 +27,11 @@ If set to true ops can skip the night no matter how many people are needed.
 
 _Default_: True
 
+### Blame
+If set to true sleeping messages (<Name> went to bed. Sweet Dreams.) are shown.
+
+_Default_: True
+
 ### Barcolor
 The color of the sleeping bar.
 
@@ -43,3 +48,9 @@ _Default_ (Player): PINK
 ## A note on AFK players
 The plugin does not keep track of afk players itself but relies on the command ```afkcheck``` from CMI.
 If this command is not available, there won't be any distinction between afk and non-afk players.
+
+
+## Changelog
+# v 1.1
+- Sleeping messages can now be shown
+- Players in creative or spectator won't be considered for the calculation
