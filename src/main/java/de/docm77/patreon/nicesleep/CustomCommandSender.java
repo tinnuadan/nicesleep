@@ -1,6 +1,7 @@
 package de.docm77.patreon.nicesleep;
 
 import java.util.Set;
+import java.util.UUID;
 
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.conversations.Conversation;
@@ -32,6 +33,18 @@ public class CustomCommandSender implements ConsoleCommandSender {
   public void sendMessage(String[] messages) {
     this.lastMessage = String.join(" ", messages);
     this.sender.sendMessage(messages);
+  }
+
+  @Override
+  public void sendMessage(UUID uuid, String s) {
+    this.lastMessage = s;
+    this.sender.sendMessage(uuid, s);
+  }
+
+  @Override
+  public void sendMessage(UUID uuid, String[] strings) {
+    this.lastMessage = String.join(" ", strings);
+    this.sender.sendMessage(uuid, strings);
   }
 
   @Override
@@ -142,7 +155,12 @@ public class CustomCommandSender implements ConsoleCommandSender {
 
   @Override
   public void sendRawMessage(String message) {
-    lastMessage = message;
-    sender.sendRawMessage(message);
+    sendRawMessage(null, message);
+  }
+
+  @Override
+  public void sendRawMessage(UUID uuid, String s) {
+    lastMessage = s;
+    sender.sendRawMessage(uuid, s);
   }
 }
