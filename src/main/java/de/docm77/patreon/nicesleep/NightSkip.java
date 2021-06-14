@@ -19,31 +19,18 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class NightSkip implements NightSkipEventHandler, PlayerSleepEventHandler, PlayerWorldChangeEventHandler
 {
 
+  private Config config;
+  private HashSet<Player> playersInBed;
+  private HashMap<World, NightSkipTimer> nightSkipTimers;
+  private HashMap<World, BossBar> bossbars;
   private final BasePlugin plugin;
-  private final double neededPercentage;
-  private final RoundingMode roundingMethod;
-  private final int skipDelay;
-  private final boolean opsCanOverride;
-  private final boolean blame;
-  private final HashSet<Player> playersInBed;
-  private final HashMap<World, NightSkipTimer> nightSkipTimers;
-  private final HashMap<World, BossBar> bossBars;
-  private final BarColor playerBarColor;
-  private final BarColor opBarColor;
 
   public NightSkip(BasePlugin plugin, Config config) {
     this.plugin = plugin;
-    this.neededPercentage = ((double) config.neededPercentage) / 100.;
-    this.roundingMethod = config.roundingMethod;
-    this.skipDelay = (int) (Math.round(config.skipDelaySeconds * 1000.0));
-    this.opsCanOverride = config.opsCanOverride;
-    this.blame = config.blame;
-    this.playerBarColor = config.barColors.get(Config.Bar.Player);
-    this.opBarColor = config.barColors.get(Config.Bar.OP);
+    this.config = config;
+    this.playersInBed = new HashSet<Player>();
     this.nightSkipTimers = new HashMap<World, NightSkipTimer>();
-    this.bossBars = new HashMap<World, BossBar>();
-
-    playersInBed = new HashSet<Player>();
+    this.bossbars = new HashMap<World, BossBar>();
   }
 
   @Override
@@ -71,6 +58,16 @@ public class NightSkip implements NightSkipEventHandler, PlayerSleepEventHandler
   }
 
   private void checkSleeping(World world) {
+    // get settings
+    final double neededPercentage = ((double) config.neededPercentage()) / 100.;
+    final int maxPlayersNeeded = config.maxPlayersNeeded();
+    final RoundingMode roundingMethod = config.roundingMethod();
+    final int skipDelay = (int) (Math.round(config.skipDelaySeconds() * 1000.0));
+    final boolean opsCanOverride = config.opsCanOverride();
+    final  BarColor playerBarColor = config.barColor(Config.Bar.Player);
+    final BarColor opBarColor = config.barColor(Config.Bar.OP);
+
+    // initialize vars
     Server srv = this.plugin.getServer();
     CustomCommandSender sender = new CustomCommandSender(srv.getConsoleSender());
     int afkPlayers = 0;
@@ -106,29 +103,28 @@ public class NightSkip implements NightSkipEventHandler, PlayerSleepEventHandler
 
     final int activePlayers = totalPlayersInWorld - afkPlayers;
     int totalNeededPlayers = Utils.Round(((double) activePlayers) * neededPercentage, roundingMethod);
-    totalNeededPlayers = Math.max(Math.min(activePlayers, totalNeededPlayers), 1); // we need at least one in total and no more than active players
+    totalNeededPlayers = Math.min(activePlayers, Math.max(totalNeededPlayers, 1)); // we need at least one in total
+    if(maxPlayersNeeded > 0) { // if a limit is set
+      totalNeededPlayers = Math.min(totalNeededPlayers, maxPlayersNeeded); 
+    }
     final int neededPlayers = totalNeededPlayers - sleepingPlayers;
 
-    NightSkipTimer timer = getTimer(world);
-    final boolean skipTheNight = neededPlayers <= 0 || (opsCanOverride && opSleeping.get());
+    NightSkipTimer timer = getTimer(world, skipDelay);
+    final boolean skipTheNight = neededPlayers <= 0 || (opsCanOverride && opSleeping);
     if (resetRequired(world)) {
       // only broadcast the message if we need more people and there are actually
       // people sleeping
       if (sleepingPlayers > 0) {
         final int playersUsedForCalculation = Math.max(neededPlayers, 0) + sleepingPlayers;
         final double perc = Math.min(100., (double) sleepingPlayers / (double) playersUsedForCalculation);
+        final BarColor barColor = (opsCanOverride && opSleeping) ? opBarColor : playerBarColor;
         if (!hasBossBar(world)) {
-          createBossBar(world, playersInWorld);
+          createBossBar(world, playersInWorld, barColor);
         }
         BossBar bb = bossBars.get(world);
         bb.setTitle("Sleeping: " + sleepingPlayers + " out of " + totalNeededPlayers + " necessary");
         bb.setProgress(perc);
-        if (opsCanOverride && opSleeping.get()) {
-          bb.setColor(opBarColor);
-        }
-        else {
-          bb.setColor(playerBarColor);
-        }
+        bb.setColor(barColor);
       }
     }
     if (sleepingPlayers == 0 && hasBossBar(world)) {
@@ -216,7 +212,7 @@ public class NightSkip implements NightSkipEventHandler, PlayerSleepEventHandler
     }
   }
 
-  private NightSkipTimer getTimer(World world) {
+  private NightSkipTimer getTimer(World world, int skipDelay) {
     if (!nightSkipTimers.containsKey(world)) {
       nightSkipTimers.put(world, new NightSkipTimer(world, skipDelay, this));
     }
@@ -227,9 +223,9 @@ public class NightSkip implements NightSkipEventHandler, PlayerSleepEventHandler
     return bossBars.containsKey(world);
   }
 
-  private void createBossBar(World world, HashSet<Player> playersInWorld) {
-    plugin.logger().fine("Creating bossbar");
-    BossBar bb = plugin.getServer().createBossBar("Sleeping", playerBarColor, BarStyle.SOLID);
+  private BossBar createBossBar(World world, HashSet<Player> playersInWorld, BarColor barColor) {
+    plugin.getLogger().fine("Creating bossbar");
+    BossBar bb = plugin.getServer().createBossBar("Sleeping", barColor, BarStyle.SOLID);
     bb.setProgress(0);
     for (Player p : playersInWorld) {
       bb.addPlayer(p);

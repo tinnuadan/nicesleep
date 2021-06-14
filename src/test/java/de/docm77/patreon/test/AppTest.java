@@ -58,11 +58,11 @@ public class AppTest {
     Config config = new Config(fconfig, log);
     config.load();
 
-    assertEquals(55, config.neededPercentage);
-    assertEquals(4.1, config.skipDelaySeconds, 0.1);
-    assertEquals(true, config.opsCanOverride);
-    assertEquals(RoundingMode.CEILING, config.roundingMethod);
-    assertEquals(BarColor.BLUE, config.barColors.get(Bar.Player));
-    assertEquals(BarColor.PINK, config.barColors.get(Bar.OP));
+    assertEquals(55, config.neededPercentage());
+    assertEquals(4.1, config.skipDelaySeconds(), 0.1);
+    assertEquals(true, config.opsCanOverride());
+    assertEquals(RoundingMode.CEILING, config.roundingMethod());
+    assertEquals(BarColor.BLUE, config.barColor(Bar.Player));
+    assertEquals(BarColor.PINK, config.barColor(Bar.OP));
   }
 }
