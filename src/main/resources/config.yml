@@ -2,7 +2,7 @@
 
 #percentage of not-afk players needed to skip the night (0 - 100).
 #0 means that any player can skip the night on their own
-percentage_needed: 0
+percentage_needed: 100
 
 #if not set to zero it will cap the amount of players needed to skip the night
 max_players: 0

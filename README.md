@@ -6,6 +6,13 @@ Spigot plugin for multiplayer servers to control how many people need to sleep f
 Percentage of not-afk players needed to skip the night (0 - 100).
 0 means that any player can skip the night on their own
 
+_Default_: 100
+
+
+### Max Players
+Sets the maximum number of non-afk players needed to skip the night.
+Basically limits the percentage
+
 _Default_: 0
 
 ### Rounding Method
@@ -20,7 +27,6 @@ How long the plugin waits once a sufficient number of players is in bed before s
 Note that 5.05 seconds is the vanilla waiting period
 
 _Default_: 4.0
-
 
 ### OPs can overide
 If set to true ops can skip the night no matter how many people are needed.
@@ -54,3 +60,8 @@ If this command is not available, there won't be any distinction between afk and
 # v 1.1
 - Sleeping messages can now be shown
 - Players in creative or spectator won't be considered for the calculation
+
+# v 1.2
+- A maximum number players needed to skip the night can be set
+- Players in creative will be considered for the calculation again
+- Default percentage is now 100 as in 1.17 vanilla

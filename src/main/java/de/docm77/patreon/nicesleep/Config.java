@@ -31,6 +31,7 @@ public final class Config {
     logger.info("\trounding_method: " + roundingMethod());
     logger.info("\tseconds_before_skip: " + skipDelaySeconds());
     logger.info("\tops_can_override: " + opsCanOverride());
+    logger.info("\tblame: " + blame());
     logger.info("\tbarcolor.player: " + barColor(Bar.Player));
     logger.info("\tbarcolor.op: " + barColor(Bar.OP));
   }
@@ -39,7 +40,7 @@ public final class Config {
     String tmp;
     HashMap<String, Object> values = new HashMap<String, Object>();
 
-    int neededPercentage = loadValue("percentage_needed", Integer.class, 0);
+    int neededPercentage = loadValue("percentage_needed", Integer.class, 100);
     neededPercentage = Math.min(100, Math.max(0, neededPercentage));
     values.put("percentage_needed", neededPercentage);
 
@@ -54,7 +55,8 @@ public final class Config {
     boolean opsCanOverride = loadValue("ops_can_override", Boolean.class, false);
     values.put("ops_can_override", opsCanOverride);
 
-    blame = loadValue("blame", Boolean.class, true);
+    boolean blame = loadValue("blame", Boolean.class, true);
+    values.put("blame", blame);
 
     tmp = loadValue("rounding_method", String.class, "HALF_UP");
     RoundingMode roundingMethod = strToRoundingMode(tmp);
@@ -77,7 +79,7 @@ public final class Config {
   }
 
   public String getStrValue(String key) {
-    if(!settingKeys.contains(key)) { 
+    if(!settingKeys.contains(key)) {
       return null;
     }
     return String.valueOf(_values.get(key));
@@ -106,6 +108,7 @@ public final class Config {
   public int maxPlayersNeeded() { return getValue("max_players", Integer.class); }
   public double skipDelaySeconds() { return getValue("seconds_before_skip", Double.class); }
   public boolean opsCanOverride() { return getValue("ops_can_override", Boolean.class); }
+  public boolean blame() { return getValue("blame", Boolean.class); }
   public RoundingMode roundingMethod() { return getValue("rounding_method", RoundingMode.class); }
   public BarColor barColor(Bar which) {
     String key = which == Bar.Player ? "barcolor.player" : "barcolor.op";
