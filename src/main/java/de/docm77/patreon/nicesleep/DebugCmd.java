@@ -30,6 +30,7 @@ class DebugCmd implements CommandExecutor
     {
       this.logger.setLogLevel(Level.ALL);
       this.logger.info("Enabling extended logging");
+      this.logger.fine("Fine logging works");
     }
     else if(arg.equals("off"))
     {

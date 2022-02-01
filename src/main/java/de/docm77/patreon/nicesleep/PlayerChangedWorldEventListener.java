@@ -19,6 +19,7 @@ class PlayerChangedWorldEventListener implements Listener {
 
   @EventHandler
   void onPlayerWorldChanged(PlayerChangedWorldEvent event) {
+    this.plugin.getLogger().info("Player world changed");
     worldChangeHandler.worldChanged(event.getPlayer(), event.getFrom(), event.getPlayer().getWorld());
   }
 
