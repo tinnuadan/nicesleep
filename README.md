@@ -17,13 +17,13 @@ _Default_: 0
 
 ### Rounding Method
 Rounding method for determining how many players are needed to skip the night.
-The values determined from java.math.RoundingMode:
+The values determined from `java.math.RoundingMode`:
 UP, DOWN, CEILING, FLOOR, HALF_UP, HALF_DOWN, HALF_EVEN. UNNECESSARY is not allowed.
 
 _Default_: UP
 
 ### Seconds Before Skip
-How long the plugin waits once a sufficient number of players is in bed before skipping the night
+How long the plugin waits once a sufficient number of players is in bed before skipping the night.
 Note that 5.05 seconds is the vanilla waiting period
 
 _Default_: 4.0
@@ -34,7 +34,7 @@ If set to true ops can skip the night no matter how many people are needed.
 _Default_: True
 
 ### Blame
-If set to true sleeping messages (<Name> went to bed. Sweet Dreams.) are shown.
+If set to true sleeping messages (`<Name> went to bed. Sweet Dreams.`) are shown.
 
 _Default_: True
 
@@ -43,7 +43,7 @@ The color of the sleeping bar.
 
 You can choose a different color to indicate when an op sleeps, and they can skip the night in any case.
 
-Colors are from org.bukkit.boss.BarColor:
+Colors are from `org.bukkit.boss.BarColor`:
 BLUE, GREEN, PINK, PURPLE, RED, WHITE, YELLOW
 
 _Default_ (OP): BLUE
