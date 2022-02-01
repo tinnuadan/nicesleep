@@ -57,11 +57,11 @@ If this command is not available, there won't be any distinction between afk and
 
 
 ## Changelog
-# v 1.1
+### v 1.1
 - Sleeping messages can now be shown
 - Players in creative or spectator won't be considered for the calculation
 
-# v 1.2
+### v 1.2
 - A maximum number players needed to skip the night can be set
 - Players in creative will be considered for the calculation again
 - Default percentage is now 100 as in 1.17 vanilla
