@@ -40,4 +40,4 @@ maven-deploy:
     - echo ${CI_PROJECT_DIR}
     - sshpass -p "${SSH_PASS}" scp -P 2225 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ./target/NiceSleep-1.2.1-SNAPSHOT-1.18.jar staff@135.181.183.58:/files/build/
   only:
-    - main
+    - master
