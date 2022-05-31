@@ -39,6 +39,6 @@ maven-deploy:
     - apk add openssh sshpass
   script:
     - echo ${CI_PROJECT_DIR}
-    - sshpass -p "${SSH_PASS}" scp -P 2225 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${ARTIFACT} staff@135.181.183.58:/files/build/
+    - sshpass -p "${SSH_PASS}" scp -P 2225 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${ARTIFACT} ${SSH_USER}@135.181.183.58:/files/build/
   only:
     - master
