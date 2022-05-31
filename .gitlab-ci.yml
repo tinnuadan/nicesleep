@@ -3,6 +3,7 @@ services:
   - docker:dind
 
 variables:
+  ARTIFACT: "./target/NiceSleep-1.2.1-SNAPSHOT-1.18.jar"
   MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
   DOCKER_DRIVER: overlay
   SPRING_PROFILES_ACTIVE: gitlab-ci
@@ -25,7 +26,7 @@ maven-build:
     - mvn package -Dmaven.test.skip
   artifacts:
     paths:
-      - ./target/NiceSleep-1.2.1-SNAPSHOT-1.18.jar
+      - ${ARTIFACT}
     expire_in: 1 week
 
 maven-deploy:
@@ -38,6 +39,6 @@ maven-deploy:
     - apk add openssh sshpass
   script:
     - echo ${CI_PROJECT_DIR}
-    - sshpass -p "${SSH_PASS}" scp -P 2225 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ./target/NiceSleep-1.2.1-SNAPSHOT-1.18.jar staff@135.181.183.58:/files/build/
+    - sshpass -p "${SSH_PASS}" scp -P 2225 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${ARTIFACT} staff@135.181.183.58:/files/build/
   only:
     - master
