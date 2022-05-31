@@ -30,13 +30,10 @@ maven-build:
     expire_in: 1 week
 
 maven-deploy:
-  image: alpine:latest
+  image: tinnuadan/ssh:latest
   stage: deploy
   dependencies: 
     - maven-build
-  before_script:
-    - apk update
-    - apk add openssh sshpass
   script:
     - echo ${CI_PROJECT_DIR}
     - sshpass -p "${SSH_PASS}" scp -P 2225 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${ARTIFACT} ${SSH_USER}@135.181.183.58:/files/build/
